@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Environment Variables
+.env
+
+# macOS specific files
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Build outputs
+dist/
+build/
+
+# Dependency directories
+jspm_packages/
+
+# Parcel files
+.cache
+# Others
+*~
+*.swp
