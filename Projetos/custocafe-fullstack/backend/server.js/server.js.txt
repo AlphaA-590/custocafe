@@ -1,0 +1,17 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const port = 3000;
+
+const glebasRouter = require('./routes/glebas');
+
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/glebas', glebasRouter);
+
+app.get('/', (req, res) => {
+    res.send('CUSTOCAFE API funcionando!');
+});
+
+app.listen(port, () => console.log(`Backend rodando em http://localhost:${port}`));

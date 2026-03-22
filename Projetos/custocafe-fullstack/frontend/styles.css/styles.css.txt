@@ -1,0 +1,105 @@
+/* ==========================================
+   CUSTOCAFE - Estilos básicos do Frontend
+   ABC PRIME COMÉRCIO SERVIÇO TECNOLOGIA LTDA
+   CNPJ: 23.360.116/0001-37
+   ========================================== */
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Corpo da página */
+body {
+    background-color: #f5f5f5;
+    color: #333333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Container central */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Título principal */
+h1, h2, h3 {
+    color: #1f2937; /* Cinza escuro */
+    margin-bottom: 20px;
+}
+
+/* Botões */
+button {
+    background-color: #16a34a; /* Verde Tailwind */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #15803d; /* Verde mais escuro */
+}
+
+/* Listas de glebas ou custos */
+ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+li {
+    padding: 6px 0;
+}
+
+/* Cards de informação */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Tabelas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #10b981; /* Verde claro */
+    color: white;
+}
+
+/* Mensagens de erro ou aviso */
+.alert {
+    padding: 10px 15px;
+    background-color: #f87171; /* Vermelho */
+    color: white;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* Rodapé */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 15px;
+    font-size: 14px;
+    color: #6b7280;
+}

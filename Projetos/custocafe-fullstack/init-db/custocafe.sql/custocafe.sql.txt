@@ -1,0 +1,210 @@
+-- ============================================
+-- CUSTOCAFE – Sistema de Gestão de Custos Agrícolas
+-- Script único: criação de tabelas + dados de exemplo
+-- Licença MIT personalizada
+-- ABC PRIME COMÉRCIO SERVIÇO TECNOLOGIA LTDA
+-- CNPJ: 23.360.116/0001-37
+-- ============================================
+
+-- ============================================
+-- 1. Tabelas
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS setores (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT
+);
+
+CREATE TABLE IF NOT EXISTS glebas (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    setor_id INT REFERENCES setores(id) ON DELETE SET NULL,
+    area_hectares DECIMAL(10,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS mao_obra_contratada (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    funcao VARCHAR(100),
+    custo_hora DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS insumos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    tipo VARCHAR(50),
+    preco_unitario DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS maquinas_automotoras (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    custo_hora DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS maquinas_implementos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    custo_hora DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS benfeitorias (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    custo DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS veiculos (
+    id SERIAL PRIMARY KEY,
+    modelo VARCHAR(100) NOT NULL,
+    custo_hora DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS operacoes_servicos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    custo DECIMAL(12,2) DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS aplicacao_adubos (
+    id SERIAL PRIMARY KEY,
+    gleba_id INT REFERENCES glebas(id) ON DELETE CASCADE,
+    insumo_id INT REFERENCES insumos(id) ON DELETE CASCADE,
+    quantidade DECIMAL(12,2) DEFAULT 0,
+    custo DECIMAL(12,2) DEFAULT 0,
+    data_aplicacao DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS aplicacao_defensivos (
+    id SERIAL PRIMARY KEY,
+    gleba_id INT REFERENCES glebas(id) ON DELETE CASCADE,
+    insumo_id INT REFERENCES insumos(id) ON DELETE CASCADE,
+    quantidade DECIMAL(12,2) DEFAULT 0,
+    custo DECIMAL(12,2) DEFAULT 0,
+    data_aplicacao DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS aplicacao_herbicidas (
+    id SERIAL PRIMARY KEY,
+    gleba_id INT REFERENCES glebas(id) ON DELETE CASCADE,
+    insumo_id INT REFERENCES insumos(id) ON DELETE CASCADE,
+    quantidade DECIMAL(12,2) DEFAULT 0,
+    custo DECIMAL(12,2) DEFAULT 0,
+    data_aplicacao DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS producao (
+    id SERIAL PRIMARY KEY,
+    gleba_id INT REFERENCES glebas(id) ON DELETE CASCADE,
+    cultura VARCHAR(100) NOT NULL,
+    quantidade DECIMAL(12,2) DEFAULT 0,
+    preco_unitario DECIMAL(12,2) DEFAULT 0,
+    data_producao DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS centro_custos (
+    id SERIAL PRIMARY KEY,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(12,2) DEFAULT 0,
+    mao_obra_id INT REFERENCES mao_obra_contratada(id),
+    maquina_id INT REFERENCES maquinas_automotoras(id),
+    data_lancamento DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS ordem_servicos (
+    id SERIAL PRIMARY KEY,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(12,2) DEFAULT 0,
+    gleba_id INT REFERENCES glebas(id) ON DELETE CASCADE,
+    data_servico DATE DEFAULT CURRENT_DATE
+);
+
+-- Índices
+CREATE INDEX IF NOT EXISTS idx_gleba_setor ON glebas(setor_id);
+CREATE INDEX IF NOT EXISTS idx_aplicacao_adubos_gleba ON aplicacao_adubos(gleba_id);
+CREATE INDEX IF NOT EXISTS idx_aplicacao_defensivos_gleba ON aplicacao_defensivos(gleba_id);
+CREATE INDEX IF NOT EXISTS idx_aplicacao_herbicidas_gleba ON aplicacao_herbicidas(gleba_id);
+CREATE INDEX IF NOT EXISTS idx_producao_gleba ON producao(gleba_id);
+CREATE INDEX IF NOT EXISTS idx_ordem_servicos_gleba ON ordem_servicos(gleba_id);
+
+-- ============================================
+-- 2. Dados de Exemplo
+-- ============================================
+
+INSERT INTO usuarios (nome, email, senha) VALUES
+('Admin', 'admin@abcprime.com.br', '$2b$10$ExemploHashSenha123');
+
+INSERT INTO setores (nome, descricao) VALUES
+('Setor Norte', 'Área principal de cultivo'),
+('Setor Sul', 'Área de apoio e armazenamento');
+
+INSERT INTO glebas (nome, setor_id, area_hectares) VALUES
+('Gleba A', 1, 12.5),
+('Gleba B', 1, 8.3),
+('Gleba C', 2, 15.0);
+
+INSERT INTO mao_obra_contratada (nome, funcao, custo_hora) VALUES
+('José da Silva', 'Tratorista', 25.00),
+('Maria Oliveira', 'Colhedora', 20.00);
+
+INSERT INTO insumos (nome, tipo, preco_unitario) VALUES
+('Adubo NPK 10-10-10', 'Adubo', 120.00),
+('Herbicida Total', 'Herbicida', 150.00),
+('Inseticida ABC', 'Defensivo', 180.00);
+
+INSERT INTO maquinas_automotoras (nome, custo_hora) VALUES
+('Trator John Deere', 50.00),
+('Colheitadeira New Holland', 80.00);
+
+INSERT INTO maquinas_implementos (nome, custo_hora) VALUES
+('Grade Aradora', 30.00),
+('Pulverizador', 40.00);
+
+INSERT INTO benfeitorias (nome, custo) VALUES
+('Armazém 1', 5000.00),
+('Cercamento Setor Norte', 2000.00);
+
+INSERT INTO veiculos (modelo, custo_hora) VALUES
+('Caminhão 3/4', 35.00),
+('Pick-up Toyota', 25.00);
+
+INSERT INTO operacoes_servicos (nome, custo) VALUES
+('Manutenção de cercas', 200.00),
+('Irrigação manual', 150.00);
+
+INSERT INTO aplicacao_adubos (gleba_id, insumo_id, quantidade, custo, data_aplicacao) VALUES
+(1, 1, 100.0, 12000.00, '2026-03-21'),
+(2, 1, 80.0, 9600.00, '2026-03-21');
+
+INSERT INTO aplicacao_defensivos (gleba_id, insumo_id, quantidade, custo, data_aplicacao) VALUES
+(1, 3, 50.0, 9000.00, '2026-03-22');
+
+INSERT INTO aplicacao_herbicidas (gleba_id, insumo_id, quantidade, custo, data_aplicacao) VALUES
+(2, 2, 30.0, 4500.00, '2026-03-22');
+
+INSERT INTO producao (gleba_id, cultura, quantidade, preco_unitario, data_producao) VALUES
+(1, 'Café Arábica', 2000, 5.50, '2026-03-20'),
+(2, 'Café Conilon', 1500, 4.50, '2026-03-20'),
+(3, 'Café Arábica', 1800, 5.25, '2026-03-20');
+
+INSERT INTO centro_custos (descricao, valor, mao_obra_id, maquina_id, data_lancamento) VALUES
+('Manutenção do Armazém', 500.00, 1, 1, '2026-03-21'),
+('Irrigação Gleba B', 300.00, 2, 2, '2026-03-21');
+
+INSERT INTO ordem_servicos (descricao, valor, gleba_id, data_servico) VALUES
+('Colheita Gleba A', 2500.00, 1, '2026-03-21'),
+('Colheita Gleba B', 1800.00, 2, '2026-03-21');
+
+-- Licença MIT personalizada
+-- Copyright (c) 2026 ABC PRIME COMÉRCIO SERVIÇO TECNOLOGIA LTDA
+-- CNPJ: 23.360.116/0001-37
+-- Permissão é concedida gratuitamente, sujeita à manutenção deste aviso de copyright.

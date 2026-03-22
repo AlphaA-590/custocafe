@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: custocafe-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: custocafe
+      POSTGRES_PASSWORD: supersegura
+      POSTGRES_DB: custocafe
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: custocafe-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: custocafe-backend
+    restart: always
+    environment:
+      DB_HOST: postgres
+      DB_USER: custocafe
+      DB_PASSWORD: supersegura
+      DB_NAME: custocafe
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+
+  frontend:
+    image: nginx:alpine
+    container_name: custocafe-frontend
+    restart: always
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

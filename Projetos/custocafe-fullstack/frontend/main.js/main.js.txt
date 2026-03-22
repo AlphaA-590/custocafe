@@ -1,0 +1,11 @@
+document.getElementById('btnGlebas').addEventListener('click', async () => {
+  const res = await fetch('http://localhost:3000/api/glebas');
+  const glebas = await res.json();
+  const list = document.getElementById('glebasList');
+  list.innerHTML = '';
+  glebas.forEach(g => {
+    const li = document.createElement('li');
+    li.textContent = `${g.nome} - Área: ${g.area_hectares} ha`;
+    list.appendChild(li);
+  });
+});

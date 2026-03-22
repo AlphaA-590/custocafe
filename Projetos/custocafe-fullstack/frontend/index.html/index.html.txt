@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>CUSTOCAFE</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">CUSTOCAFE – Dashboard</h1>
+    <button id="btnGlebas" class="bg-green-500 text-white px-4 py-2 rounded">Carregar Glebas</button>
+    <ul id="glebasList" class="mt-4 list-disc pl-6"></ul>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
