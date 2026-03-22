@@ -1,150 +1,115 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const { body, validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+'use strict';
 
-const app = express();
+const express = require('express');
+const cors    = require('cors');
+const path    = require('path');
+const jwt     = require('jsonwebtoken');
+const bcrypt  = require('bcrypt');
+
+const pool          = require('./db');
+const redisClient   = require('./redis');
+const glebasRouter       = require('./routes/glebas');
+const centroCustosRouter = require('./routes/centro_custos');
+const ordemServicosRouter = require('./routes/ordem_servicos');
+
+const app  = express();
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'custocafe_jwt_secret_change_in_production';
+
+// ── Middleware ────────────────────────────────────────────────────────────────
+app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/custocafe', { useNewUrlParser: true, useUnifiedTopology: true });
-
-// Middleware for authentication
+// ── Auth helpers ──────────────────────────────────────────────────────────────
 const authenticateJWT = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (token) {
-        jwt.verify(token, 'your_jwt_secret', (err, user) => {
-            if (err) return res.sendStatus(403);
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ')
+        ? authHeader.slice(7)
+        : authHeader;
+    if (!token) return res.sendStatus(401);
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+// ── Auth routes ───────────────────────────────────────────────────────────────
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { nome, email, senha } = req.body;
+        if (!nome || !email || !senha)
+            return res.status(400).json({ error: 'nome, email e senha são obrigatórios' });
+
+        const hashed = await bcrypt.hash(senha, 10);
+        const result = await pool.query(
+            'INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3) RETURNING id, nome, email',
+            [nome, email, hashed]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') return res.status(409).json({ error: 'E-mail já cadastrado' });
+        console.error('register error:', err.message);
+        res.status(500).json({ error: 'Erro interno' });
     }
-};
+});
 
-// Password strength checking function
-const checkPasswordStrength = (password) => {
-    const strongPasswordRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}/;
-    return strongPasswordRegex.test(password);
-};
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+        if (!email || !senha)
+            return res.status(400).json({ error: 'email e senha são obrigatórios' });
 
-// Email validation function
-const validateEmail = (email) => {
-    const emailRegex = /^[\w-\.]+@[\w-\.]+\.[a-z]{2,4}$/;
-    return emailRegex.test(email);
-};
+        const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        const user   = result.rows[0];
+        if (!user) return res.status(401).json({ error: 'Credenciais inválidas' });
 
-// User model
-const User = mongoose.model('User', new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-}));
+        const match = await bcrypt.compare(senha, user.senha);
+        if (!match) return res.status(401).json({ error: 'Credenciais inválidas' });
 
-// Registration endpoint
-app.post('/register', [
-    body('email').isEmail().custom((value) => {
-        if (!validateEmail(value)) {
-            throw new Error('Invalid email');
-        }
-        return true;
-    }),
-    body('password').custom((value) => {
-        if (!checkPasswordStrength(value)) {
-            throw new Error('Password is not strong enough');
-        }
-        return true;
-    }),
-], (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        const token = jwt.sign(
+            { id: user.id, email: user.email, nome: user.nome },
+            JWT_SECRET,
+            { expiresIn: '8h' }
+        );
+        res.json({ token, user: { id: user.id, nome: user.nome, email: user.email } });
+    } catch (err) {
+        console.error('login error:', err.message);
+        res.status(500).json({ error: 'Erro interno' });
     }
-    const { email, password } = req.body;
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const user = new User({ email, password: hashedPassword });
-    user.save()
-        .then(() => res.status(201).send('User registered'))
-        .catch(err => res.status(500).send(err));
 });
 
-// Login endpoint
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    User.findOne({ email })
-        .then(user => {
-            if (!user || !bcrypt.compareSync(password, user.password)) {
-                return res.status(401).send('Invalid credentials');
-            }
-            const token = jwt.sign({ email: user.email }, 'your_jwt_secret', { expiresIn: '1h' });
-            res.json({ token });
-        })
-        .catch(err => res.status(500).send(err));
+// ── API routes ────────────────────────────────────────────────────────────────
+app.use('/api/glebas',         glebasRouter);
+app.use('/api/centro-custos',  centroCustosRouter);
+app.use('/api/ordem-servicos', ordemServicosRouter);
+
+// ── Health check ──────────────────────────────────────────────────────────────
+app.get('/health', async (req, res) => {
+    try {
+        await pool.query('SELECT 1');
+        res.json({ status: 'ok', db: 'connected', redis: redisClient.isReady ? 'connected' : 'disconnected' });
+    } catch (err) {
+        res.status(500).json({ status: 'error', db: 'disconnected', message: err.message });
+    }
 });
 
-// CRUD for glebas
-const Gleba = mongoose.model('Gleba', new mongoose.Schema({
-    name: String,
-    description: String,
-}));
+// ── Serve React frontend as static files ──────────────────────────────────────
+const frontendPath = path.join(__dirname, '..', 'frontend');
+app.use(express.static(frontendPath));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.send('OK');
+// SPA fallback – serve index.html for any non-API route
+app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// GET all glebas
-app.get('/glebas', (req, res) => {
-    Gleba.find().then(glebas => res.json(glebas)).catch(err => res.status(500).send(err));
-});
-
-// POST create gleba
-app.post('/glebas', authenticateJWT, (req, res) => {
-    const { name, description } = req.body;
-    const gleba = new Gleba({ name, description });
-    gleba.save()
-        .then(() => res.status(201).send('Gleba created'))
-        .catch(err => res.status(500).send(err));
-});
-
-// GET gleba by ID
-app.get('/glebas/:id', (req, res) => {
-    Gleba.findById(req.params.id)
-        .then(gleba => {
-            if (!gleba) return res.status(404).send('Gleba not found');
-            res.json(gleba);
-        })
-        .catch(err => res.status(500).send(err));
-});
-
-// PUT update gleba
-app.put('/glebas/:id', authenticateJWT, (req, res) => {
-    Gleba.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        .then(updatedGleba => {
-            if (!updatedGleba) return res.status(404).send('Gleba not found');
-            res.json(updatedGleba);
-        })
-        .catch(err => res.status(500).send(err));
-});
-
-// DELETE gleba
-app.delete('/glebas/:id', authenticateJWT, (req, res) => {
-    Gleba.findByIdAndDelete(req.params.id)
-        .then(result => {
-            if (!result) return res.status(404).send('Gleba not found');
-            res.send('Gleba deleted');
-        })
-        .catch(err => res.status(500).send(err));
-});
-
-// Error handling middleware
+// ── Global error handler ──────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res.status(500).json({ error: 'Algo deu errado!' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// ── Start ─────────────────────────────────────────────────────────────────────
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅  CUSTOCAFE API rodando em http://0.0.0.0:${PORT}`);
 });

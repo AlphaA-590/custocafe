@@ -1,0 +1,396 @@
+/* ============================================================
+   CUSTOCAFE – Estilos principais
+   ABC PRIME COMÉRCIO SERVIÇO TECNOLOGIA LTDA
+   CNPJ: 23.360.116/0001-37
+   ============================================================ */
+
+/* ── Reset & base ──────────────────────────────────────────── */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --green-600:  #16a34a;
+    --green-700:  #15803d;
+    --green-100:  #dcfce7;
+    --amber-500:  #f59e0b;
+    --red-500:    #ef4444;
+    --red-600:    #dc2626;
+    --blue-500:   #3b82f6;
+    --gray-50:    #f9fafb;
+    --gray-100:   #f3f4f6;
+    --gray-200:   #e5e7eb;
+    --gray-400:   #9ca3af;
+    --gray-600:   #4b5563;
+    --gray-800:   #1f2937;
+    --white:      #ffffff;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.10);
+    --shadow-md:  0 4px 12px rgba(0,0,0,.12);
+    --radius:     8px;
+    --font:       'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font);
+    background-color: var(--gray-100);
+    color: var(--gray-800);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .2s, opacity .2s;
+    text-decoration: none;
+}
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+
+.btn--primary   { background: var(--green-600); color: var(--white); }
+.btn--primary:hover:not(:disabled) { background: var(--green-700); }
+
+.btn--secondary { background: var(--gray-200); color: var(--gray-800); }
+.btn--secondary:hover:not(:disabled) { background: var(--gray-400); color: var(--white); }
+
+.btn--warning   { background: var(--amber-500); color: var(--white); }
+.btn--warning:hover:not(:disabled) { filter: brightness(.9); }
+
+.btn--danger    { background: var(--red-500); color: var(--white); }
+.btn--danger:hover:not(:disabled) { background: var(--red-600); }
+
+.btn--sm  { padding: 5px 12px; font-size: 12px; }
+.btn--full { width: 100%; }
+
+/* ── Alerts ────────────────────────────────────────────────── */
+.alert {
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.alert--error   { background: #fee2e2; color: var(--red-600); border: 1px solid #fca5a5; }
+.alert--success { background: var(--green-100); color: var(--green-700); border: 1px solid #86efac; }
+
+/* ── Spinner ───────────────────────────────────────────────── */
+.spinner {
+    text-align: center;
+    padding: 24px;
+    color: var(--gray-400);
+    font-style: italic;
+}
+
+/* ── Login ─────────────────────────────────────────────────── */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    padding: 20px;
+}
+
+.login-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-md);
+}
+
+.login-logo {
+    font-size: 48px;
+    text-align: center;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--green-700);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: var(--gray-600);
+    font-size: 13px;
+    margin-bottom: 24px;
+}
+
+.login-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+    margin-top: 14px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+}
+.login-form input:focus { border-color: var(--green-600); }
+
+.login-form .btn { margin-top: 20px; }
+
+/* ── Pricing ───────────────────────────────────────────────── */
+.pricing {
+    margin-top: 28px;
+    border-top: 1px solid var(--gray-200);
+    padding-top: 20px;
+}
+
+.pricing-title {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.pricing-plans {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.plan {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 13px;
+    background: var(--gray-50);
+}
+
+.plan strong { color: var(--gray-800); }
+.plan span   { color: var(--green-600); font-weight: 700; font-size: 12px; }
+
+.plan--highlight {
+    border-color: var(--green-600);
+    background: var(--green-100);
+}
+
+/* ── Dashboard layout ──────────────────────────────────────── */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+.header {
+    background: var(--green-700);
+    color: var(--white);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logo { font-size: 24px; }
+
+.header-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+}
+
+/* ── Tab navigation ────────────────────────────────────────── */
+.tab-nav {
+    background: var(--white);
+    border-bottom: 2px solid var(--gray-200);
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s;
+    margin-bottom: -2px;
+}
+
+.tab-btn:hover { color: var(--green-600); }
+
+.tab-btn--active {
+    color: var(--green-700);
+    border-bottom-color: var(--green-600);
+}
+
+/* ── Main content ──────────────────────────────────────────── */
+.main-content {
+    flex: 1;
+    padding: 28px 24px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ── CRUD section ──────────────────────────────────────────── */
+.crud-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 20px;
+}
+
+/* ── CRUD form ─────────────────────────────────────────────── */
+.crud-form {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 180px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.form-group input {
+    padding: 9px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+}
+.form-group input:focus { border-color: var(--green-600); }
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ── Table ─────────────────────────────────────────────────── */
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    font-size: 14px;
+}
+
+thead tr { background: var(--green-700); }
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-800);
+}
+
+tbody tr:hover { background: var(--gray-50); }
+tbody tr:last-child td { border-bottom: none; }
+
+td.empty {
+    text-align: center;
+    color: var(--gray-400);
+    font-style: italic;
+    padding: 32px;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: var(--gray-400);
+    border-top: 1px solid var(--gray-200);
+    background: var(--white);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .header { padding: 12px 16px; }
+    .header-title { font-size: 16px; }
+    .header-user span { display: none; }
+    .main-content { padding: 16px; }
+    .crud-form { flex-direction: column; }
+    .form-group { flex: 1 1 100%; }
+    .pricing-plans { flex-direction: column; }
+    .tab-nav { padding: 0 8px; }
+    .tab-btn { padding: 12px 14px; font-size: 13px; }
+}
