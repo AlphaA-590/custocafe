@@ -1,19 +1,4 @@
 -- schema.sql
-
-CREATE TABLE cafes (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    location VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE producao (
-    id SERIAL PRIMARY KEY,
-    cafe_id INT NOT NULL,
-    product_name VARCHAR(100) NOT NULL,
-    quantity INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (cafe_id) REFERENCES cafes(id) ON DELETE CASCADE
-);
+-- Alias: see init-db/custocafe.sql for the full schema.
+-- This file is kept for reference only.
+-- Run init-db/custocafe.sql against your PostgreSQL instance to initialise CUSTOCAFE.
